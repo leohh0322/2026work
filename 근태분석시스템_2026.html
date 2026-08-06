@@ -425,36 +425,34 @@
    const [userName, userCompName] = userKey.split('|');
    const userDept = userCompName || userName;
    const userTeam = DEPT_TO_TEAM_MAP[userDept] || '기타';
-   let totalInSum = 0;
-   let totalOutSum = 0;
-   let inCount = 0;
-   let outCount = 0;
+   // 같은 팀 구성원 목록(중복 제거)
+   const seenKeys = new Set();
+   const teamMemberKeys = [];
    memberRawData.forEach(row => {
-    const dept = row['회사내 이름'];
-    const team = DEPT_TO_TEAM_MAP[dept];
+    const name = row['이름'];
+    const compName = row['회사내 이름'] || '';
+    if (!name) return;
+    const team = DEPT_TO_TEAM_MAP[compName] || '기타';
     if (team !== userTeam) return;
-    const special = row['특이사항'] ? String(row['특이사항']).trim() : '';
-    if (special.includes('입사일 이전')) return;
-    const vacationMins = memberParseToMinutes(row['휴가시간']);
-    if (vacationMins > 0) return;
-    let inTime = memberParseToMinutes(row['출근시각']);
-    let outTime = memberParseToMinutes(row['퇴근시각']);
-    if (outTime > 0 && inTime > 0 && outTime < inTime) {
-     outTime += 1440;
-    }
-    if (inTime > 0) {
-     totalInSum += inTime;
-     inCount++;
-    }
-    if (outTime > 0) {
-     totalOutSum += outTime;
-     outCount++;
-    }
+    const key = `${name}|${compName}`;
+    if (!seenKeys.has(key)) { seenKeys.add(key); teamMemberKeys.push(key); }
    });
-   const avgInMins = inCount > 0 ? totalInSum / inCount : 0;
-   const avgOutMins = outCount > 0 ? totalOutSum / outCount : 0;
+   // 구성원 개인별 월 평균을 각각 구한 뒤, 그 평균들의 평균을 계산
+   // (기록이 없어 개인 평균이 나오지 않는 사람은 분모에서 제외)
+   const prevCalculated = memberCurrentCalculatedData; // 개인 카드 데이터 보존
+   const memberAvgIns = [];
+   const memberAvgOuts = [];
+   teamMemberKeys.forEach(key => {
+    const result = memberCalculateData(key);
+    if (!result) return;
+    if (result.avgInRaw > 0) memberAvgIns.push(result.avgInRaw);
+    if (result.avgOutRaw > 0) memberAvgOuts.push(result.avgOutRaw);
+   });
+   memberCurrentCalculatedData = prevCalculated; // 선택된 구성원 데이터 복원
+   const avgInMins = memberAvgIns.length > 0 ? memberAvgIns.reduce((a, b) => a + b, 0) / memberAvgIns.length : 0;
+   const avgOutMins = memberAvgOuts.length > 0 ? memberAvgOuts.reduce((a, b) => a + b, 0) / memberAvgOuts.length : 0;
    document.getElementById('dept_avg_title').innerText = `👥 ${userTeam} 평균 출퇴근`;
-   if (inCount > 0) {
+   if (memberAvgIns.length > 0) {
     const inHour = Math.floor(avgInMins / 60);
     const inMin = Math.round(avgInMins % 60);
     document.getElementById('dept_avg_in').innerText = `${String(inHour).padStart(2,'0')}:${String(inMin).padStart(2,'0')}`;
@@ -463,7 +461,7 @@
     document.getElementById('dept_avg_in').innerText = '-';
     document.getElementById('dept_avg_in_label').innerText = `${userTeam} 평균`;
    }
-   if (outCount > 0) {
+   if (memberAvgOuts.length > 0) {
     const displayOutMins = avgOutMins % 1440;
     const outHour = Math.floor(displayOutMins / 60);
     const outMin = Math.round(displayOutMins % 60);
@@ -606,7 +604,8 @@
       hasHolidayType: false,
       isBeforeJoinDate: false,
       isMissing: true,
-      policies: []
+      policies: [],
+      leavePolicies: []
      });
     } else {
      const existing = dailyMap.get(dateStr);
@@ -619,6 +618,7 @@
     if (hasHolidayType) { day.hasHolidayType = true; }
     if (isBeforeJoinDate) { day.isBeforeJoinDate = true; }
     if (row['근무정책']) { day.isMissing = false; day.policies.push(row['근무정책']); }
+    if (row['휴가정책'] && String(row['휴가정책']).trim() !== '') { day.leavePolicies.push(String(row['휴가정책']).trim()); }
     if (row['휴가정책'] || row['휴일구분']) day.isMissing = false;
     if (inTime > 0 && inTime < day.in) day.in = inTime;
     if (outTime > 0 && outTime > day.out) day.out = outTime;
@@ -688,7 +688,8 @@
      out: finalOut,
      isWorkDay: isWorkDay,
      isMissing: (day.isMissing || isInsufficientTime) && !day.isBeforeJoinDate,
-     policy: [...new Set(day.policies)].join(', ')
+     policy: [...new Set(day.policies)].join(', '),
+     vacationReason: [...new Set(day.leavePolicies)].join(', ')
     });
    });
    const stdMins = workDays * 480, overMins = Math.max(0, totalMins - stdMins);
@@ -711,6 +712,8 @@
     stdHoursRaw: stdMins / 60, totalHoursRaw: totalMins / 60, overHoursRaw: overMins / 60, vacationHoursRaw: vacationMins / 60,
     vacationUsed: vacationInfo.used, vacationRemain: vacationInfo.remain,
     avgHoursPerDay: avgHoursPerDay,
+    avgInRaw: avgIn,
+    avgOutRaw: avgOut,
     weekdayOvertime: weekdayOvertime,
     weekdayMaxCount: weekdayMaxCount,
     weekdayOvertimeDates: weekdayOvertimeDates,
@@ -763,7 +766,7 @@
       }); 
       break;
     case 'overTime': title.innerText = '🔥 일자별 초과 근무'; cfg.data.datasets.push({ label: '분', data: memberCurrentCalculatedData.dayByDay.map(d => d.over), backgroundColor: '#ef4444' }); memberCurrentCalculatedData.dayByDay.forEach(d => { if (d.over > 0) list.innerHTML += `<div class="modal-list-item"><span>${d.date}</span><span>${memberFormatMinutes(d.over)}</span></div>`; }); break;
-    case 'vacation': title.innerText = '🏖️ 휴가 사용 상세'; memberCurrentCalculatedData.dayByDay.filter(d => d.vacation > 0).forEach(d => { list.innerHTML += `<div class="modal-list-item"><span>${d.date}</span><span>${memberFormatMinutes(d.vacation)}</span></div>`; }); cfg.data.datasets.push({ label: '분', data: memberCurrentCalculatedData.dayByDay.map(d => d.vacation), backgroundColor: '#10b981' }); break;
+    case 'vacation': title.innerText = '🏖️ 휴가 사용 상세'; memberCurrentCalculatedData.dayByDay.filter(d => d.vacation > 0).forEach(d => { const reason = d.vacationReason ? `<span style="color:#64748b; font-weight:400;"> · ${d.vacationReason}</span>` : ''; list.innerHTML += `<div class="modal-list-item"><span>${d.date}</span><span><span style="font-weight:600;">${memberFormatMinutes(d.vacation)}</span>${reason}</span></div>`; }); cfg.data.datasets.push({ label: '분', data: memberCurrentCalculatedData.dayByDay.map(d => d.vacation), backgroundColor: '#10b981' }); break;
     case 'missing': 
       title.innerText = '⚠️ 기록 누락 일자'; 
       cfg.data.datasets.push({ 
