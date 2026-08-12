@@ -13,35 +13,27 @@
   // ============================================================
   const MANAGER_PASSWORD = "admin2025"; // ← 담당자 암호 (원하는 값으로 변경)
   const SHEET_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTxBvVil1szQqCeFl2qOVYnSSK16ZtlRlUji8sTtdgzAKLa4M73ngCHPHh2oewE-GAP5VQLsLV8f_wT/pub';
-  const SHEET_URLS = {
-   // 2026년 근태 데이터 (gid만 바꿔서 월 추가)
-   '2026.01': `${SHEET_BASE}?gid=1593039693&single=true&output=csv`,
-   '2026.02': `${SHEET_BASE}?gid=2013871368&single=true&output=csv`,
-   '2026.03': `${SHEET_BASE}?gid=233631330&single=true&output=csv`,
-   '2026.04': `${SHEET_BASE}?gid=1226805075&single=true&output=csv`,
-   '2026.05': `${SHEET_BASE}?gid=1081821277&single=true&output=csv`,
-   '2026.06': `${SHEET_BASE}?gid=1403028767&single=true&output=csv`,
-   '2026.07': `${SHEET_BASE}?gid=39959209&single=true&output=csv`,
-   // 잔여연차 시트
-   '휴가': `${SHEET_BASE}?gid=1588070847&single=true&output=csv`,
-   // 화면 월 탭에서 부르는 별칭
-   '1월': `${SHEET_BASE}?gid=1593039693&single=true&output=csv`,
-   '2월': `${SHEET_BASE}?gid=2013871368&single=true&output=csv`,
-   '3월': `${SHEET_BASE}?gid=233631330&single=true&output=csv`,
-   '4월': `${SHEET_BASE}?gid=1226805075&single=true&output=csv`,
-   '5월': `${SHEET_BASE}?gid=1081821277&single=true&output=csv`,
-   '6월': `${SHEET_BASE}?gid=1403028767&single=true&output=csv`,
-   '7월': `${SHEET_BASE}?gid=39959209&single=true&output=csv`
+  // 월 추가는 여기 한 줄만: '8월': '<gid>'  (SHEET_URLS / MONTH_MAPPING 자동 생성)
+  const MONTH_GIDS = {
+   '1월': '1593039693',
+   '2월': '2013871368',
+   '3월': '233631330',
+   '4월': '1226805075',
+   '5월': '1081821277',
+   '6월': '1403028767',
+   '7월': '39959209'
   };
-  const MONTH_MAPPING = {
-   '1월': '2026.01',
-   '2월': '2026.02',
-   '3월': '2026.03',
-   '4월': '2026.04',
-   '5월': '2026.05',
-   '6월': '2026.06',
-   '7월': '2026.07'
-  };
+  const VACATION_GID = '1588070847';
+  const SHEET_YEAR = '2026';
+  const csvUrl = gid => `${SHEET_BASE}?gid=${gid}&single=true&output=csv`;
+  const SHEET_URLS = { '휴가': csvUrl(VACATION_GID) };
+  const MONTH_MAPPING = {};
+  Object.entries(MONTH_GIDS).forEach(([label, gid]) => {
+   const key = `${SHEET_YEAR}.${String(parseInt(label, 10)).padStart(2, '0')}`; // 예: 2026.07
+   SHEET_URLS[key] = csvUrl(gid);   // 연월 키
+   SHEET_URLS[label] = csvUrl(gid); // 화면 탭 별칭
+   MONTH_MAPPING[label] = key;
+  });
   function getSheetKeyForMonth(month) {
    return MONTH_MAPPING[month] || month;
   }
@@ -535,11 +527,62 @@
    }
    return style === 'colon' ? `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}${nextDay}` : `${h}시간 ${m}분`;
   }
-  function memberParseToMinutes(val) {
+  // 시각 파싱/시간 포맷 공통 구현 (member*/ceo* 는 동일 로직이었음 → 별칭)
+  function parseToMinutes(val) {
    if (!val) return 0;
    if (typeof val === 'number') return Math.round(val * 24 * 60);
    if (typeof val === 'string') { const p = val.trim().split(':'); if (p.length >= 2) return parseInt(p[0]) * 60 + parseInt(p[1]); }
    return 0;
+  }
+  function formatHoursMinutes(mins) {
+   let hours = Math.floor(mins / 60);
+   let minutes = Math.round(mins % 60);
+   if (minutes === 60) { hours += 1; minutes = 0; }
+   return minutes === 0 ? `${hours}시간` : `${hours}시간 ${minutes}분`;
+  }
+  const memberParseToMinutes = parseToMinutes;
+  const ceoParseToMinutes = parseToMinutes;
+  const ceoFormatHoursMinutes = formatHoursMinutes;
+  const formatMinutesToHoursMinutes = formatHoursMinutes;
+  // 하루 최소 인정 근무시간(휴가시간 포함) — 미만이면 '근무시간 부족'으로 표시
+  const MIN_DAILY_WORK_MIN = 8 * 60; // 480분 = 8시간
+  // 고정 점심(휴게) 시간대 — 회사 정책이 바뀌면 이 두 줄만 수정
+  const LUNCH_START_MIN = 12 * 60; // 12:00
+  const LUNCH_END_MIN   = 13 * 60; // 13:00
+  // 근무 구간과 점심 구간이 실제로 겹치는 만큼만 차감 (하루 1회, 최대 60분)
+  // 예) 09:00~18:00 → 60분 차감 / 13:00~18:00 → 0분(점심을 낀 적 없음)
+  function getLunchDeduction(inMins, outMins) {
+   if (!(inMins > 0 && outMins > 0 && outMins > inMins)) return 0;
+   const overlap = Math.min(outMins, LUNCH_END_MIN) - Math.max(inMins, LUNCH_START_MIN);
+   return overlap > 0 ? overlap : 0;
+  }
+  // 구성원별 계산 결과 캐시: 같은 데이터(월)에 대해 동일 구성원을 반복 계산하지 않음
+  // (목록 화면·부서 평균·조직 차트가 같은 계산을 여러 번 호출하므로 효과가 큼)
+  const CALC_CACHE = new WeakMap();
+  function getCalcCache(rows) {
+   let entry = CALC_CACHE.get(rows);
+   if (!entry || entry.vacationRef !== VACATION_DATA) { // 잔여연차 데이터가 바뀌면 무효화
+    entry = { vacationRef: VACATION_DATA, results: new Map() };
+    CALC_CACHE.set(rows, entry);
+   }
+   return entry.results;
+  }
+  // 구성원별 행 묶음 캐시 (데이터 배열이 바뀌면 자동 무효화)
+  const ROWS_BY_USER_CACHE = new WeakMap();
+  function getRowsByUser(rows) {
+   let index = ROWS_BY_USER_CACHE.get(rows);
+   if (index) return index;
+   index = new Map();
+   rows.forEach(r => {
+    const name = r['이름'];
+    if (!name) return;
+    const key = `${name}|${r['회사내 이름'] || ''}`;
+    let bucket = index.get(key);
+    if (!bucket) { bucket = []; index.set(key, bucket); }
+    bucket.push(r);
+   });
+   ROWS_BY_USER_CACHE.set(rows, index);
+   return index;
   }
   function memberFormatDaysToText(days) {
    if (!days || days === 0) return '0일';
@@ -561,8 +604,20 @@
    }
   }
   function memberCalculateData(key) {
+   const cache = getCalcCache(memberRawData);
+   if (cache.has(key)) {
+    const cached = cache.get(key);
+    // 원본과 동일: 결과가 없으면(null) 전역 데이터를 건드리지 않음
+    if (cached) memberCurrentCalculatedData = cached;
+    return cached;
+   }
+   const computed = memberComputeData(key);
+   cache.set(key, computed);
+   return computed;
+  }
+  function memberComputeData(key) {
    const [targetName, targetCompName] = key.split('|');
-   const userRows = memberRawData.filter(r => r['이름'] === targetName && (r['회사내 이름'] || '') === targetCompName);
+   const userRows = getRowsByUser(memberRawData).get(key) || [];
    if (!userRows.length) return null;
    const dailyMap = new Map();
    userRows.forEach(row => {
@@ -578,22 +633,22 @@
       dateStr = `${d.getMonth()+1}/${d.getDate()}`;
      } catch(e) {}
     }
-    const total = memberParseToMinutes(row['총 근무']), vacation = memberParseToMinutes(row['휴가시간']);
-    let inTime = memberParseToMinutes(row['출근시각']), outTime = memberParseToMinutes(row['퇴근시각']);
-    // 출퇴근시각이 없으면 시작종료시각 사용
-    if (inTime === 0 && row['근무정책']) {
-     inTime = memberParseToMinutes(row['시작시각']);
-    }
-    if (outTime === 0 && row['근무정책']) {
-     outTime = memberParseToMinutes(row['종료시각']);
-    }
+    const vacation = memberParseToMinutes(row['휴가시간']);
+    // 시작/종료시각(보정된 인정 시간)을 1순위로 사용, 없을 때만 출퇴근 태그로 보완
+    // → 한쪽만 비었을 때 서로 다른 출처를 섞어 계산하던 문제 해결
+    let inTime = memberParseToMinutes(row['시작시각']) || memberParseToMinutes(row['출근시각']);
+    let outTime = memberParseToMinutes(row['종료시각']) || memberParseToMinutes(row['퇴근시각']);
+    // 휴가 전용 행(근무정책 없이 휴가정책만 있는 행)의 시각은 근무 구간에서 제외
+    // → 휴가 시간대가 근무로 잡혀 휴가시간과 이중 계산되던 문제 해결
+    const hasWorkPolicyRow = row['근무정책'] && String(row['근무정책']).trim() !== '';
+    const hasLeavePolicyRow = row['휴가정책'] && String(row['휴가정책']).trim() !== '';
+    if (hasLeavePolicyRow && !hasWorkPolicyRow) { inTime = 0; outTime = 0; }
     if (outTime > 0 && inTime > 0 && outTime < inTime) {
      outTime += 1440;
     }
     const hasHolidayType = row['휴일구분'] && String(row['휴일구분']).trim() !== '';
     const specialNote = row['특이사항'] ? String(row['특이사항']).trim() : '';
     const isBeforeJoinDate = specialNote.includes('입사일 이전');
-    const isMissing = !row['근무정책'] && !row['휴가정책'] && !row['휴일구분'];
     if (!dailyMap.has(dateStr)) {
      dailyMap.set(dateStr, {
       date: dateStr,
@@ -634,10 +689,9 @@
     let dayWorkMins = 0;
     if (finalIn > 0 && finalOut > 0 && finalOut > finalIn) {
      dayWorkMins = finalOut - finalIn;
-     // 휴게시간 1시간 차감
-     if (dayWorkMins > 60) {
-      dayWorkMins -= 60;
-     }
+     // 점심시간이 근무 구간에 실제로 포함된 경우에만 차감
+     dayWorkMins -= getLunchDeduction(finalIn, finalOut);
+     if (dayWorkMins < 0) dayWorkMins = 0;
     }
     if (!day.isBeforeJoinDate) { totalMins += dayWorkMins + day.vacation; vacationMins += day.vacation; }
     if (day.vacation === 0) {
@@ -677,7 +731,7 @@
      }
     }
     const totalWithVacation = dayWorkMins + day.vacation;
-    const isInsufficientTime = isWorkDay && totalWithVacation > 0 && totalWithVacation < 470;
+    const isInsufficientTime = isWorkDay && totalWithVacation > 0 && totalWithVacation < MIN_DAILY_WORK_MIN;
     dayByDay.push({
      date: day.date,
      rawDate: day.rawDate,
@@ -702,7 +756,7 @@
      workMins += 1440;
     }
     if (workMins >= 0 && workMins <= 1440) {
-     workMins -= 60;
+     workMins -= getLunchDeduction(avgIn, avgIn + workMins);
      if (workMins < 0) workMins = 0;
      avgHoursPerDay = workMins / 60;
     }
@@ -758,7 +812,7 @@
           } else {
             detailText = memberFormatMinutes(d.vacation);
           }
-          const isInsufficient = d.isWorkDay && totalTime < 470;
+          const isInsufficient = d.isWorkDay && totalTime < MIN_DAILY_WORK_MIN;
           const itemClass = isInsufficient ? ' style="color:#ef4444; font-weight:600;"' : '';
           const warningIcon = isInsufficient ? ' ⚠️' : '';
           list.innerHTML += `<div class="modal-list-item"${itemClass}><span>${d.date}</span><span>${detailText}${warningIcon}</span></div>`; 
@@ -780,7 +834,7 @@
         let reason = '';
         if (totalTime === 0) {
           reason = '기록 없음';
-        } else if (totalTime < 470) {
+        } else if (totalTime < MIN_DAILY_WORK_MIN) {
           reason = `근무시간 부족 (${memberFormatMinutes(totalTime)})`;
         } else {
           reason = '기록 없음';
@@ -1172,36 +1226,6 @@
    });
    return { labels: teamLabels, values: teamValues };
   }
-  function ceoParseToMinutes(val) {
-   if (!val) return 0;
-   if (typeof val === 'number') return Math.round(val * 24 * 60);
-   if (typeof val === 'string') { const p = val.trim().split(':'); if (p.length >= 2) return parseInt(p[0]) * 60 + parseInt(p[1]); }
-   return 0;
-  }
-  function ceoFormatHoursMinutes(mins) {
-   let hours = Math.floor(mins / 60);
-   let minutes = Math.round(mins % 60);
-   if (minutes === 60) {
-    hours += 1;
-    minutes = 0;
-   }
-   if (minutes === 0) {
-    return `${hours}시간`;
-   }
-   return `${hours}시간 ${minutes}분`;
-  }
-  function formatMinutesToHoursMinutes(minutes) {
-   let hours = Math.floor(minutes / 60);
-   let mins = Math.round(minutes % 60);
-   if (mins === 60) {
-    hours += 1;
-    mins = 0;
-   }
-   if (mins === 0) {
-    return `${hours}시간`;
-   }
-   return `${hours}시간 ${mins}분`;
-  }
   const TEAM_COLORS = {
    '개발팀': '#3b82f6',
    '경영지원팀': '#10b981',
@@ -1405,9 +1429,6 @@
   }
   async function ceoProcessExcel(data) {
    const users = {}, departments = {}, teams = {}, missingStats = {};
-   const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-   const weekdayData = { '월': [], '화': [], '수': [], '목': [], '금': [], '토': [], '일': [] };
-   const dailyPersonData = {};
    let totalOverMins = 0, totalMissingCount = 0;
    data.forEach(row => {
     const name = row['이름'], dept = row['회사내 이름'] || '미분류';
@@ -1451,14 +1472,14 @@
       });
      }
      const dayData = users[userId].dailyMap.get(dateKey);
-     let inMins = ceoParseToMinutes(row['출근시각']);
-     let outMins = ceoParseToMinutes(row['퇴근시각']);
-     // 출퇴근시각이 없으면 시작종료시각 사용
-     if (inMins === 0 && policy) {
-      inMins = ceoParseToMinutes(row['시작시각']);
-     }
-     if (outMins === 0 && policy) {
-      outMins = ceoParseToMinutes(row['종료시각']);
+     // 시작/종료시각(보정된 인정 시간)을 1순위로 사용, 없을 때만 출퇴근 태그로 보완
+     let inMins = ceoParseToMinutes(row['시작시각']) || ceoParseToMinutes(row['출근시각']);
+     let outMins = ceoParseToMinutes(row['종료시각']) || ceoParseToMinutes(row['퇴근시각']);
+     // 휴가 전용 행의 시각은 근무 구간에서 제외 (개인 상세와 동일 규칙)
+     if (isNoPolicy && leavePolicy && String(leavePolicy).trim() !== '') { inMins = 0; outMins = 0; }
+     // 익일 퇴근(퇴근시각이 출근시각보다 이른 경우) 보정 — 개인 상세 계산과 동일하게 처리
+     if (outMins > 0 && inMins > 0 && outMins < inMins) {
+      outMins += 1440;
      }
      if (inMins > 0 && inMins < dayData.inMin) dayData.inMin = inMins;
      if (outMins > 0 && outMins > dayData.outMax) dayData.outMax = outMins;
@@ -1466,37 +1487,6 @@
      if (isOffDay) dayData.hasHolidayType = true;
      const hasLeavePolicy = leavePolicy && String(leavePolicy).trim() !== '';
      if (!isNoPolicy || hasLeavePolicy) dayData.hasPolicy = true;
-    }
-    if (!isOffDay && dateStr) {
-     try {
-      let d;
-      if (dateStr instanceof Date) {
-       d = dateStr;
-      } else {
-       d = new Date(dateStr);
-      }
-      const dayOfWeek = weekdays[d.getDay()];
-      const dateKey = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
-      const personDateKey = `${name}_${dateKey}`;
-      if (!dailyPersonData[personDateKey]) {
-       dailyPersonData[personDateKey] = {
-        name: name,
-        date: dateKey,
-        dayOfWeek: dayOfWeek,
-        inMin: Infinity,
-        outMax: -Infinity
-       };
-      }
-      const inMins = ceoParseToMinutes(row['출근시각']);
-      const outMins = ceoParseToMinutes(row['퇴근시각']);
-      if (inMins > 0 && inMins < dailyPersonData[personDateKey].inMin) {
-       dailyPersonData[personDateKey].inMin = inMins;
-      }
-      if (outMins > 0 && outMins > dailyPersonData[personDateKey].outMax) {
-       dailyPersonData[personDateKey].outMax = outMins;
-      }
-     } catch(e) {
-     }
     }
    });
    Object.values(users).forEach(user => {
@@ -1513,15 +1503,14 @@
      let dayWorkMins = 0;
      if (inMin > 0 && outMax > 0 && outMax > inMin) {
       dayWorkMins = outMax - inMin;
-      // 휴게시간 1시간 차감
-      if (dayWorkMins > 60) {
-       dayWorkMins -= 60;
-      }
+      // 점심시간이 근무 구간에 실제로 포함된 경우에만 차감
+      dayWorkMins -= getLunchDeduction(inMin, outMax);
+      if (dayWorkMins < 0) dayWorkMins = 0;
      }
      const dayTotal = dayWorkMins + dayData.vacationMins;
      totalMins += dayTotal;
      const isNoPolicy = !dayData.hasPolicy;
-     const isInsufficientTime = isWorkDay && dayTotal > 0 && dayTotal < 470;
+     const isInsufficientTime = isWorkDay && dayTotal > 0 && dayTotal < MIN_DAILY_WORK_MIN;
      if (isWorkDay && (isNoPolicy || isInsufficientTime)) {
       missingCount++;
      }
@@ -1541,17 +1530,6 @@
     if (teamCat !== 'EXCLUDED') {
      if (!teams[teamCat]) teams[teamCat] = 0;
      teams[teamCat] += user.overMins;
-    }
-   });
-   Object.values(dailyPersonData).forEach(personDay => {
-    const inMin = personDay.inMin === Infinity ? 0 : personDay.inMin;
-    const outMax = personDay.outMax === -Infinity ? 0 : personDay.outMax;
-    let dayMins = 0;
-    if (inMin > 0 && outMax > 0 && outMax > inMin) {
-     dayMins = outMax - inMin;
-    }
-    if (dayMins > 0 && weekdayData[personDay.dayOfWeek]) {
-     weekdayData[personDay.dayOfWeek].push(dayMins);
     }
    });
    const vacationData = await getTotalVacationByMonth(currentCeoMonth);
