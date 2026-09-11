@@ -1,10 +1,10 @@
-<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>통합 근태 분석 시스템 (2026) · 담당자용</title><script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script><script src="https://cdn.tailwindcss.com"></script><style> @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');body{font-family:'Noto Sans KR',sans-serif;background:#f4f7fa}.view{display:none}.view.active{display:block}.month-tabs{display:flex;gap:12px;margin-bottom:30px;padding:20px;background:white;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,0.05);flex-wrap:wrap}.month-tab{padding:12px 24px;border-radius:10px;background:#f1f5f9;color:#64748b;border:2px solid transparent;cursor:pointer;font-weight:600;transition:all 0.3s ease;font-size:14px}.month-tab:hover{background:#e2e8f0;transform:translateY(-2px)}.month-tab.active{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border-color:#667eea;box-shadow:0 4px 12px rgba(102,126,234,0.4)}.month-tab.loading{opacity:0.6;cursor:wait}.member-view-content{display:none}.member-view-content.active{display:block}.stat-card{transition:all 0.3s ease;position:relative}.stat-card:hover{transform:translateY(-5px)}.stat-card.clickable{cursor:pointer}.member-list-popup{visibility:hidden;opacity:0;position:absolute;top:calc(100% + 10px);left:0;width:280px;max-height:350px;background:white;border-radius:12px;box-shadow:0 15px 35px rgba(0,0,0,0.2);z-index:100;padding:16px;border:1px solid #e2e8f0;overflow-y:auto;transition:opacity 0.2s ease,visibility 0.2s ease}.stat-card:hover .member-list-popup{visibility:visible;opacity:1}.member-list-popup::-webkit-scrollbar{width:6px}.member-list-popup::-webkit-scrollbar-thumb{background-color:#cbd5e1;border-radius:10px}.info-card{background:#f8fafc;border-radius:12px;padding:20px;transition:transform 0.2s;cursor:pointer;position:relative}.info-card:hover{transform:translateY(-3px);box-shadow:0 5px 15px rgba(0,0,0,0.05);background:#f1f5f9}.info-card::after{content:'🔍';position:absolute;top:10px;right:10px;font-size:12px;opacity:0.3}.status-dot{display:inline-block;width:18px;height:18px;border-radius:50%;margin-right:8px;position:relative;cursor:help;transition:transform 0.2s}.status-dot:hover{transform:scale(1.3)}.status-dot.green{background-color:#10b981}.status-dot.red{background-color:#ef4444}.status-dot[data-tooltip]{position:relative}.status-dot[data-tooltip]::after{content:attr(data-tooltip);position:absolute;bottom:calc(100% + 10px);left:0;transform:translateX(0);background:rgba(0,0,0,0.95);color:white;padding:10px 16px;border-radius:8px;font-size:13px;white-space:normal;max-width:300px;min-width:200px;opacity:0;pointer-events:none;transition:opacity 0.3s;z-index:1000;line-height:1.4;box-shadow:0 4px 12px rgba(0,0,0,0.3);text-align:left}.status-dot[data-tooltip]::before{content:'';position:absolute;bottom:calc(100% + 4px);left:20px;transform:translateX(0);border:6px solid transparent;border-top-color:rgba(0,0,0,0.9);opacity:0;pointer-events:none;transition:opacity 0.3s;z-index:1000}.status-dot[data-tooltip]:hover::after,.status-dot[data-tooltip]:hover::before{opacity:1}.analysis-tab{padding:8px 16px;border:none;background:none;color:#64748b;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.3s ease}.analysis-tab:hover{color:#3b82f6}.analysis-tab.active{color:#3b82f6;border-bottom-color:#3b82f6}.analysis-tab-content{display:none}.analysis-tab-content.active{display:block}.label{font-size:12px;color:#64748b;font-weight:600;text-transform:uppercase;margin-bottom:5px}.value{font-size:24px;font-weight:800;color:#1e293b}.sub-value{font-size:13px;color:#94a3b8;margin-top:4px}.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;justify-content:center;align-items:center;z-index:1000;backdrop-filter:blur(4px)}.modal-content{background:white;width:90%;max-width:800px;border-radius:20px;padding:30px;position:relative;max-height:85vh;overflow-y:auto}.modal-close{position:absolute;top:20px;right:20px;font-size:24px;cursor:pointer;color:#64748b}.modal-title{font-size:20px;font-weight:700;margin-bottom:20px;color:#1e293b;border-bottom:2px solid #f1f5f9;padding-bottom:10px}.modal-chart-wrapper{height:350px;width:100%;margin-bottom:20px}.modal-list-wrapper{max-height:400px;overflow-y:auto;background:#f8fafc;border-radius:10px;padding:15px}.modal-list-item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e2e8f0;font-size:14px}.modal-list-item:last-child{border-bottom:none}.nav-button{position:fixed;top:20px;left:20px;background:white;color:#667eea;border:none;padding:10px 20px;border-radius:10px;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.15);transition:all 0.3s ease;z-index:999}.nav-button:hover{background:#667eea;color:white;transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,0.2)}.header-button:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.15)}select{background:white;color:#1f2937}select option{color:#1f2937;background:white}.loading-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.9);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999}#ceoTeamChart{cursor:pointer}.team-chart-hint{font-size:14px;color:#94a3b8;text-align:center;margin-top:8px;font-style:italic}.loading-spinner{width:50px;height:50px;border:4px solid #f3f3f3;border-top:4px solid #667eea;border-radius:50%;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.loading-text{margin-top:20px;font-size:18px;color:#1e293b;font-weight:600}.remain-vacation-card{background:linear-gradient(135deg,#06b6d4 0%,#0891b2 100%);border-radius:16px;padding:24px;color:white;margin-bottom:24px;box-shadow:0 4px 12px rgba(6,182,212,0.3)}.remain-vacation-card .label{color:rgba(255,255,255,0.9);font-size:14px;margin-bottom:8px}.remain-vacation-card .value{color:white;font-size:36px;font-weight:900}.remain-vacation-card .sub-value{color:rgba(255,255,255,0.8);font-size:14px;margin-top:8px}.password-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:10000;justify-content:center;align-items:center;backdrop-filter:blur(8px)}.password-modal.active{display:flex}.password-box{background:white;border-radius:20px;padding:40px;max-width:400px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3)}.password-title{font-size:24px;font-weight:700;color:#1e293b;margin-bottom:10px;text-align:center}.password-subtitle{font-size:14px;color:#64748b;margin-bottom:30px;text-align:center}.password-input{width:100%;padding:12px 16px;border:2px solid #e2e8f0;border-radius:10px;font-size:16px;transition:all 0.3s}.password-input:focus{outline:none;border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,0.1)}.password-input.error{border-color:#ef4444;animation:shake 0.5s}@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}.password-buttons{display:flex;gap:10px;margin-top:20px}.password-btn{flex:1;padding:12px;border:none;border-radius:10px;font-weight:600;cursor:pointer;transition:all 0.3s}.password-btn.submit{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white}.password-btn.submit:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(102,126,234,0.4)}.password-error{color:#ef4444;font-size:14px;margin-top:10px;text-align:center;display:none}.password-error.active{display:block}.lock-icon{font-size:48px;text-align:center;margin-bottom:20px}.member-table{background:white;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.05)}.member-table table{width:100%;border-collapse:collapse}.member-table th{background:#f8fafc;padding:15px;text-align:left;font-size:12px;font-weight:700;color:#475569;text-transform:uppercase;border-bottom:2px solid #e2e8f0}.member-table td{padding:15px;border-bottom:1px solid #f1f5f9;color:#334155;font-size:14px}.member-table tbody tr{cursor:pointer;transition:background 0.15s}.member-table tbody tr:hover{background:#eef2ff}.team-badge{display:inline-block;padding:3px 10px;border-radius:9999px;font-size:11px;font-weight:700;color:white}.missing-badge{display:inline-block;min-width:36px;text-align:center;padding:3px 8px;border-radius:6px;font-size:12px;font-weight:700}.missing-badge.ok{background:#f0fdf4;color:#15803d}.missing-badge.warn{background:#fef2f2;color:#dc2626}</style>
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>통합 근태 분석 시스템 (2026) · 담당자용</title><script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script><script src="https://cdn.tailwindcss.com"></script><style> @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');body{font-family:'Noto Sans KR',sans-serif;background:#f4f7fa}.view{display:none}.view.active{display:block}.month-tabs{display:flex;gap:12px;margin-bottom:30px;padding:20px;background:white;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,0.05);flex-wrap:wrap}.month-tab{padding:12px 24px;border-radius:10px;background:#f1f5f9;color:#64748b;border:2px solid transparent;cursor:pointer;font-weight:600;transition:all 0.3s ease;font-size:14px}.month-tab:hover{background:#e2e8f0;transform:translateY(-2px)}.month-tab.active{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border-color:#667eea;box-shadow:0 4px 12px rgba(102,126,234,0.4)}.month-tab.loading{opacity:0.6;cursor:wait}.member-view-content{display:none}.member-view-content.active{display:block}.stat-card{transition:all 0.3s ease;position:relative}.stat-card:hover{transform:translateY(-5px)}.stat-card.clickable{cursor:pointer}.member-list-popup{visibility:hidden;opacity:0;position:absolute;top:calc(100% + 10px);left:0;width:280px;max-height:350px;background:white;border-radius:12px;box-shadow:0 15px 35px rgba(0,0,0,0.2);z-index:100;padding:16px;border:1px solid #e2e8f0;overflow-y:auto;transition:opacity 0.2s ease,visibility 0.2s ease}.stat-card:hover .member-list-popup{visibility:visible;opacity:1}.member-list-popup::-webkit-scrollbar{width:6px}.member-list-popup::-webkit-scrollbar-thumb{background-color:#cbd5e1;border-radius:10px}.info-card{background:#f8fafc;border-radius:12px;padding:20px;transition:transform 0.2s;cursor:pointer;position:relative}.info-card:hover{transform:translateY(-3px);box-shadow:0 5px 15px rgba(0,0,0,0.05);background:#f1f5f9}.info-card::after{content:'🔍';position:absolute;top:10px;right:10px;font-size:12px;opacity:0.3}.status-dot{display:inline-block;width:18px;height:18px;border-radius:50%;margin-right:8px;position:relative;cursor:help;transition:transform 0.2s}.status-dot:hover{transform:scale(1.3)}.status-dot.green{background-color:#10b981}.status-dot.red{background-color:#ef4444}.status-dot[data-tooltip]{position:relative}.status-dot[data-tooltip]::after{content:attr(data-tooltip);position:absolute;bottom:calc(100% + 10px);left:0;transform:translateX(0);background:rgba(0,0,0,0.95);color:white;padding:10px 16px;border-radius:8px;font-size:13px;white-space:normal;max-width:300px;min-width:200px;opacity:0;pointer-events:none;transition:opacity 0.3s;z-index:1000;line-height:1.4;box-shadow:0 4px 12px rgba(0,0,0,0.3);text-align:left}.status-dot[data-tooltip]::before{content:'';position:absolute;bottom:calc(100% + 4px);left:20px;transform:translateX(0);border:6px solid transparent;border-top-color:rgba(0,0,0,0.9);opacity:0;pointer-events:none;transition:opacity 0.3s;z-index:1000}.status-dot[data-tooltip]:hover::after,.status-dot[data-tooltip]:hover::before{opacity:1}.analysis-tab{padding:8px 16px;border:none;background:none;color:#64748b;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.3s ease}.analysis-tab:hover{color:#3b82f6}.analysis-tab.active{color:#3b82f6;border-bottom-color:#3b82f6}.analysis-tab-content{display:none}.analysis-tab-content.active{display:block}.label{font-size:12px;color:#64748b;font-weight:600;text-transform:uppercase;margin-bottom:5px}.value{font-size:24px;font-weight:800;color:#1e293b}.sub-value{font-size:13px;color:#94a3b8;margin-top:4px}.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;justify-content:center;align-items:center;z-index:1000;backdrop-filter:blur(4px)}.modal-content{background:white;width:90%;max-width:800px;border-radius:20px;padding:30px;position:relative;max-height:85vh;overflow-y:auto}.modal-close{position:absolute;top:20px;right:20px;font-size:24px;cursor:pointer;color:#64748b}.modal-title{font-size:20px;font-weight:700;margin-bottom:20px;color:#1e293b;border-bottom:2px solid #f1f5f9;padding-bottom:10px}.modal-chart-wrapper{height:350px;width:100%;margin-bottom:20px}.modal-list-wrapper{max-height:400px;overflow-y:auto;background:#f8fafc;border-radius:10px;padding:15px}.modal-list-item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e2e8f0;font-size:14px}.modal-list-item:last-child{border-bottom:none}.nav-button{position:fixed;top:20px;left:20px;background:white;color:#667eea;border:none;padding:10px 20px;border-radius:10px;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.15);transition:all 0.3s ease;z-index:999}.nav-button:hover{background:#667eea;color:white;transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,0.2)}.header-button:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.15)}select{background:white;color:#1f2937}select option{color:#1f2937;background:white}.loading-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.9);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999}#ceoTeamChart{cursor:pointer}.team-chart-hint{font-size:14px;color:#94a3b8;text-align:center;margin-top:8px;font-style:italic}.loading-spinner{width:50px;height:50px;border:4px solid #f3f3f3;border-top:4px solid #667eea;border-radius:50%;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.loading-text{margin-top:20px;font-size:18px;color:#1e293b;font-weight:600}.remain-vacation-card{background:linear-gradient(135deg,#06b6d4 0%,#0891b2 100%);border-radius:16px;padding:24px;color:white;margin-bottom:24px;box-shadow:0 4px 12px rgba(6,182,212,0.3)}.remain-vacation-card .label{color:rgba(255,255,255,0.9);font-size:14px;margin-bottom:8px}.remain-vacation-card .value{color:white;font-size:36px;font-weight:900}.remain-vacation-card .sub-value{color:rgba(255,255,255,0.8);font-size:14px;margin-top:8px}.password-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:10000;justify-content:center;align-items:center;backdrop-filter:blur(8px)}.password-modal.active{display:flex}.password-box{background:white;border-radius:20px;padding:40px;max-width:400px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3)}.password-title{font-size:24px;font-weight:700;color:#1e293b;margin-bottom:10px;text-align:center}.password-subtitle{font-size:14px;color:#64748b;margin-bottom:30px;text-align:center}.password-input{width:100%;padding:12px 16px;border:2px solid #e2e8f0;border-radius:10px;font-size:16px;transition:all 0.3s}.password-input:focus{outline:none;border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,0.1)}.password-input.error{border-color:#ef4444;animation:shake 0.5s}@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}.password-buttons{display:flex;gap:10px;margin-top:20px}.password-btn{flex:1;padding:12px;border:none;border-radius:10px;font-weight:600;cursor:pointer;transition:all 0.3s}.password-btn.submit{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white}.password-btn.submit:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(102,126,234,0.4)}.password-error{color:#ef4444;font-size:14px;margin-top:10px;text-align:center;display:none}.password-error.active{display:block}.lock-icon{font-size:48px;text-align:center;margin-bottom:20px}.member-table{background:white;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.05)}.member-table table{width:100%;border-collapse:collapse}.member-table th{background:#f8fafc;padding:15px;text-align:left;font-size:12px;font-weight:700;color:#475569;text-transform:uppercase;border-bottom:2px solid #e2e8f0}.member-table td{padding:15px;border-bottom:1px solid #f1f5f9;color:#334155;font-size:14px}.member-table tbody tr{cursor:pointer;transition:background 0.15s}.member-table tbody tr:hover{background:#eef2ff}.team-badge{display:inline-block;padding:3px 10px;border-radius:9999px;font-size:11px;font-weight:700;color:white}.missing-badge{display:inline-block;min-width:36px;text-align:center;padding:3px 8px;border-radius:6px;font-size:12px;font-weight:700}.missing-badge.ok{background:#f0fdf4;color:#15803d}.missing-badge.warn{background:#fef2f2;color:#dc2626}.weekly-table{width:100%;border-collapse:collapse;font-size:14px}.weekly-table th{background:#f8fafc;padding:12px 14px;text-align:left;font-size:12px;font-weight:700;color:#475569;border-bottom:2px solid #e2e8f0;white-space:nowrap}.weekly-table td{padding:12px 14px;border-bottom:1px solid #f1f5f9;color:#334155;white-space:nowrap}.weekly-table tbody tr{cursor:pointer;transition:background 0.15s}.weekly-table tbody tr:hover{background:#eef2ff}.week-badge{display:inline-block;padding:3px 10px;border-radius:9999px;font-size:11px;font-weight:700}.week-badge.ok{background:#f0fdf4;color:#15803d}.week-badge.warn{background:#fffbeb;color:#b45309}.week-badge.danger{background:#fef2f2;color:#dc2626}.week-badge.short{background:#dc2626;color:#fff}.week-partial{font-size:11px;color:#94a3b8;font-weight:500;margin-left:6px}</style>
 </head><body><div class="loading-overlay" id="loadingOverlay" style="display: none;"><div class="loading-spinner"></div><div class="loading-text" id="loadingText">Google Sheets에서 데이터를 불러오는 중...</div><div class="loading-progress" id="loadingProgress" style="margin-top: 15px; font-size: 14px; color: #94a3b8;"></div></div><div class="password-modal active" id="passwordModal"><div class="password-box"><div class="lock-icon">🔒</div><div class="password-title" id="passwordTitle">근태 리포트 · 담당자 로그인</div><div class="password-subtitle" id="passwordSubtitle">담당자 암호를 입력하세요</div><input type="password" class="password-input" id="passwordInput" placeholder="암호를 입력하세요" /><div class="password-error" id="passwordError">❌ 암호가 올바르지 않습니다</div><div class="password-buttons"><button class="password-btn submit" id="loginButton" onclick="verifyInitialPassword()" style="width: 100%;">로그인</button></div></div></div><div id="listView" class="view"><div class="p-6 md:p-10"><div class="mx-auto" style="max-width: 2000px;"><header class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-6"><h1 class="text-3xl font-bold text-gray-800 flex items-center gap-3" style="min-width: 300px; word-break: keep-all; white-space: normal;"><span class="bg-blue-600 p-2 rounded-lg text-white text-xl">👥</span>구성원 근태 목록
-                    </h1><div class="flex gap-3"><button class="header-button" onclick="showView('ceo')" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; border: none; transition: all 0.3s ease;">📊 전사 대시보드</button></div></header><div class="month-tabs" id="listMonthTabs"><div class="month-tab active" data-month="1월" onclick="listSwitchMonth('1월')">📅 1월</div><div class="month-tab" data-month="2월" onclick="listSwitchMonth('2월')">📅 2월</div><div class="month-tab" data-month="3월" onclick="listSwitchMonth('3월')">📅 3월</div><div class="month-tab" data-month="4월" onclick="listSwitchMonth('4월')">📅 4월</div><div class="month-tab" data-month="5월" onclick="listSwitchMonth('5월')">📅 5월</div><div class="month-tab" data-month="6월" onclick="listSwitchMonth('6월')">📅 6월</div><div class="month-tab" data-month="7월" onclick="listSwitchMonth('7월')">📅 7월</div><div class="month-tab" data-month="8월" onclick="listSwitchMonth('8월')">📅 8월</div></div><p class="text-sm text-gray-500 mb-4">💡 구성원을 클릭하면 상세 리포트로 이동합니다.</p><div class="member-table"><table><thead><tr><th>구성원</th><th>소속</th><th>근무일</th><th>기준 근로시간</th><th>총 근무시간</th><th>초과 근무</th><th>휴가 사용</th><th>기록 누락</th></tr></thead><tbody id="memberListBody"><tr><td colspan="8" style="text-align: center; color: #94a3b8; padding: 40px;">데이터를 불러오는 중...</td></tr></tbody></table></div></div></div></div><div id="memberView" class="view"><button class="nav-button" onclick="showView('list')">← 구성원 목록</button><div class="modal-overlay" id="memberModalOverlay"><div class="modal-content"><span class="modal-close" id="memberModalClose">&times;</span><div class="modal-title" id="memberModalTitle">상세 내역</div><div class="modal-chart-wrapper"><canvas id="memberModalChart"></canvas></div><div class="modal-list-wrapper" id="memberModalList"></div></div></div><div class="p-6 md:p-10"><div class="mx-auto bg-white rounded-2xl shadow-lg overflow-hidden" style="max-width: 2000px;"><div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-8"><div class="flex flex-col md:flex-row md:items-center justify-between gap-6"><div style="min-width: 300px;"><h1 id="memberReportTitle" class="text-3xl font-bold mb-2" style="word-break: keep-all; white-space: normal;">📊 근태 정산 리포트 (담당자 확인용)</h1><p class="opacity-90" style="font-size: 14px; line-height: 1.6;">📅 리포트 정보 기준: 매월 1일 오전 10시 기준(1일이 주말 또는 공휴일일 경우에는 첫번 째 월요일 오전 10시 기준)
+                    </h1><div class="flex gap-3"><button class="header-button" onclick="showView('ceo')" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; border: none; transition: all 0.3s ease;">📊 전사 대시보드</button></div></header><div class="month-tabs" id="listMonthTabs"><div class="month-tab active" data-month="1월" onclick="listSwitchMonth('1월')">📅 1월</div><div class="month-tab" data-month="2월" onclick="listSwitchMonth('2월')">📅 2월</div><div class="month-tab" data-month="3월" onclick="listSwitchMonth('3월')">📅 3월</div><div class="month-tab" data-month="4월" onclick="listSwitchMonth('4월')">📅 4월</div><div class="month-tab" data-month="5월" onclick="listSwitchMonth('5월')">📅 5월</div><div class="month-tab" data-month="6월" onclick="listSwitchMonth('6월')">📅 6월</div><div class="month-tab" data-month="7월" onclick="listSwitchMonth('7월')">📅 7월</div><div class="month-tab" data-month="8월" onclick="listSwitchMonth('8월')">📅 8월</div></div><p class="text-sm text-gray-500 mb-4">💡 구성원을 클릭하면 상세 리포트로 이동합니다.</p><div class="member-table"><table><thead><tr><th>구성원</th><th>소속</th><th>근무일</th><th>기준 근로시간</th><th>총 근무시간</th><th>초과 근무</th><th>휴가 사용</th><th>주 최대 연장</th><th>기록 누락</th></tr></thead><tbody id="memberListBody"><tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 40px;">데이터를 불러오는 중...</td></tr></tbody></table></div></div></div></div><div id="memberView" class="view"><button class="nav-button" onclick="showView('list')">← 구성원 목록</button><div class="modal-overlay" id="memberModalOverlay"><div class="modal-content"><span class="modal-close" id="memberModalClose">&times;</span><div class="modal-title" id="memberModalTitle">상세 내역</div><div class="modal-chart-wrapper"><canvas id="memberModalChart"></canvas></div><div class="modal-list-wrapper" id="memberModalList"></div></div></div><div class="p-6 md:p-10"><div class="mx-auto bg-white rounded-2xl shadow-lg overflow-hidden" style="max-width: 2000px;"><div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-8"><div class="flex flex-col md:flex-row md:items-center justify-between gap-6"><div style="min-width: 300px;"><h1 id="memberReportTitle" class="text-3xl font-bold mb-2" style="word-break: keep-all; white-space: normal;">📊 근태 정산 리포트 (담당자 확인용)</h1><p class="opacity-90" style="font-size: 14px; line-height: 1.6;">📅 리포트 정보 기준: 매월 1일 오전 10시 기준(1일이 주말 또는 공휴일일 경우에는 첫번 째 월요일 오전 10시 기준)
                             </p></div><div class="flex items-center gap-4 bg-white bg-opacity-20 p-4 rounded-xl backdrop-blur-sm"><select id="memberUserSelect" disabled class="px-4 py-2.5 rounded-lg border-none font-medium bg-white text-gray-800"><option>대상자 선택</option></select></div></div></div><div class="month-tabs" id="memberMonthTabs"><div class="month-tab active" data-month="1월" onclick="memberSwitchMonth('1월')">📅 1월</div><div class="month-tab" data-month="2월" onclick="memberSwitchMonth('2월')">📅 2월</div><div class="month-tab" data-month="3월" onclick="memberSwitchMonth('3월')">📅 3월</div><div class="month-tab" data-month="4월" onclick="memberSwitchMonth('4월')">📅 4월</div><div class="month-tab" data-month="5월" onclick="memberSwitchMonth('5월')">📅 5월</div><div class="month-tab" data-month="6월" onclick="memberSwitchMonth('6월')">📅 6월</div><div class="month-tab" data-month="7월" onclick="memberSwitchMonth('7월')">📅 7월</div><div class="month-tab" data-month="8월" onclick="memberSwitchMonth('8월')">📅 8월</div></div><div class="p-8"><div id="personalView" class="member-view-content active"><div class="grid grid-cols-1 lg:grid-cols-3 gap-6"><div class="lg:col-span-2"><div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"><div class="info-card blue" onclick="memberShowDetail('workDays')"><div class="label"><span class="status-dot green" data-tooltip="이번 달의 공휴일 휴무일을 제외한 근무일입니다."></span>근무일</div><div class="value" id="member_val_workDays">-</div><div class="sub-value">중복 제외 근무 일수</div></div><div class="info-card blue"><div class="label"><span class="status-dot green" data-tooltip="일일 근무시간 X 근무일을 한 시간입니다."></span>기준 근로시간</div><div class="value" id="member_val_stdHours">-</div><div class="sub-value">근무일 × 8시간</div></div><div class="info-card purple" onclick="memberShowDetail('totalHours')"><div class="label"><span class="status-dot green" id="total_status_dot"></span>총 근무시간</div><div class="value" id="member_val_totalHours">-</div><div class="sub-value">실제 근무 합계</div></div><div class="info-card red" onclick="memberShowDetail('overTime')"><div class="label"><span class="status-dot red" id="overtime_status_dot"></span>초과 근무</div><div class="value" id="member_val_overTime">-</div><div class="sub-value">총 근무 - 기준 시간</div></div><div class="info-card green" onclick="memberShowDetail('vacation')"><div class="label"><span class="status-dot green" data-tooltip="이번 달 사용한 연차입니다."></span>휴가 사용</div><div class="value" id="member_val_vacation">-</div><div class="sub-value">이번 달 사용한 연차</div></div><div class="info-card red" onclick="memberShowDetail('missing')"><div class="label"><span class="status-dot green" id="missing_status_dot"></span>기록 누락</div><div class="value" id="member_val_missing">-</div></div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"><div class="info-card" onclick="memberShowDetail('avgIn')"><div class="label"><span class="status-dot green" id="avgin_status_dot"></span>평균 출근 시각</div><div class="value" id="member_val_avgIn">-</div></div><div class="info-card" onclick="memberShowDetail('avgOut')"><div class="label"><span class="status-dot green" id="avgout_status_dot"></span>평균 퇴근 시각</div><div class="value" id="member_val_avgOut">-</div></div></div><div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-6 mb-6 border border-indigo-200"><h3 class="text-lg font-bold text-indigo-800 mb-4 text-center">📊 조직 전체 평균 출퇴근</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="bg-white rounded-lg p-4 shadow-sm"><div class="text-sm text-green-600 font-semibold mb-2">🌅 평균 출근시간</div><div class="text-2xl font-bold text-green-700" id="org_avg_in">-</div><div class="text-xs text-green-500 mt-1">조직 전체 평균</div></div><div class="bg-white rounded-lg p-4 shadow-sm"><div class="text-sm text-purple-600 font-semibold mb-2">🌆 평균 퇴근시간</div><div class="text-2xl font-bold text-purple-700" id="org_avg_out">-</div><div class="text-xs text-purple-500 mt-1">조직 전체 평균</div></div></div></div><div class="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-6 mb-6 border border-blue-200"><h3 class="text-lg font-bold text-blue-800 mb-4 text-center" id="dept_avg_title">👥 소속 부서 평균 출퇴근</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="bg-white rounded-lg p-4 shadow-sm"><div class="text-sm text-blue-600 font-semibold mb-2">🌅 평균 출근시간</div><div class="text-2xl font-bold text-blue-700" id="dept_avg_in">-</div><div class="text-xs text-blue-500 mt-1" id="dept_avg_in_label">부서 평균</div></div><div class="bg-white rounded-lg p-4 shadow-sm"><div class="text-sm text-cyan-600 font-semibold mb-2">🌆 평균 퇴근시간</div><div class="text-2xl font-bold text-cyan-700" id="dept_avg_out">-</div><div class="text-xs text-cyan-500 mt-1" id="dept_avg_out_label">부서 평균</div></div></div></div></div><div class="lg:col-span-1"><div class="remain-vacation-card"><div class="label">💎 잔여 연차</div><div class="value" id="member_val_remainVacation">-</div></div><div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-6 mb-6 border border-orange-200 shadow-md"><div class="text-sm text-orange-600 font-semibold mb-2">⏱️ 하루 평균 근무시간</div><div class="text-4xl font-bold text-orange-700" id="member_val_avgHoursPerDay">-</div></div><div class="bg-white rounded-xl p-6 shadow-md border border-gray-200"><div class="flex gap-2 mb-4 border-b border-gray-200"><button class="analysis-tab active" data-tab="overtime" onclick="switchAnalysisTab('overtime')">📊 초과근무
                                     </button><button class="analysis-tab" data-tab="commute" onclick="switchAnalysisTab('commute')">📈 출퇴근 패턴
-                                    </button></div><div id="tab-overtime" class="analysis-tab-content active"><h3 class="text-md font-bold text-gray-700 mb-3">요일별 초과근무 횟수</h3><div class="text-xs text-gray-500 mb-3">8시간 이상 근무 (월~금)</div><div style="height: 200px;"><canvas id="weekdayOvertimeChart"></canvas></div></div><div id="tab-commute" class="analysis-tab-content" style="display: none;"><h3 class="text-md font-bold text-gray-700 mb-3">요일별 평균 출퇴근 시간</h3><div class="text-xs text-gray-500 mb-3">월~금 평균 시간</div><div style="height: 200px; position: relative;"><canvas id="weekdayCommuteChart" style="width: 100% !important; height: 100% !important;"></canvas></div></div></div></div></div></div></div></div></div></div><div id="ceoView" class="view"><div class="modal-overlay" id="ceoVacationModalOverlay"><div class="modal-content"><span class="modal-close" id="ceoVacationModalClose">&times;</span><div class="modal-title" id="ceoVacationModalTitle">🏖️ 휴가 사용 상세</div><div class="modal-list-wrapper" id="ceoVacationModalList"></div></div></div><div class="modal-overlay" id="ceoMissingModalOverlay"><div class="modal-content"><span class="modal-close" id="ceoMissingModalClose">&times;</span><div class="modal-title" id="ceoMissingModalTitle">⚠️ 근무 기록 누락 상세</div><div class="modal-list-wrapper" id="ceoMissingModalList"></div></div></div><div class="modal-overlay" id="ceoTeamDetailModalOverlay"><div class="modal-content"><span class="modal-close" id="ceoTeamDetailModalClose">&times;</span><div class="modal-title" id="ceoTeamDetailModalTitle">📊 조직별 구성원 초과근무 현황</div><div class="modal-list-wrapper" id="ceoTeamDetailModalList"></div></div></div><div class="p-6 md:p-10"><div class="mx-auto" style="max-width: 2000px;"><header class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-6"><h1 class="text-3xl font-bold text-gray-800 flex items-center gap-3" style="min-width: 300px; word-break: keep-all; white-space: normal;"><span class="bg-blue-600 p-2 rounded-lg text-white text-xl">📊</span>전사 근태 분석 대시보드
-                    </h1><div class="flex gap-3"><button class="header-button" onclick="showView('list')" style="background: white; color: #667eea; border: 2px solid #667eea; padding: 10px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">← 구성원 목록</button></div></header><div class="month-tabs" id="ceoMonthTabs"><div class="month-tab active" data-month="1월" onclick="ceoSwitchMonth('1월')">📅 1월</div><div class="month-tab" data-month="2월" onclick="ceoSwitchMonth('2월')">📅 2월</div><div class="month-tab" data-month="3월" onclick="ceoSwitchMonth('3월')">📅 3월</div><div class="month-tab" data-month="4월" onclick="ceoSwitchMonth('4월')">📅 4월</div><div class="month-tab" data-month="5월" onclick="ceoSwitchMonth('5월')">📅 5월</div><div class="month-tab" data-month="6월" onclick="ceoSwitchMonth('6월')">📅 6월</div><div class="month-tab" data-month="7월" onclick="ceoSwitchMonth('7월')">📅 7월</div><div class="month-tab" data-month="8월" onclick="ceoSwitchMonth('8월')">📅 8월</div></div><div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8"><div class="stat-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100 cursor-pointer"><p class="text-sm font-medium text-gray-500 mb-1">총 분석 인원</p><h3 id="ceo_stat_totalPeople" class="text-3xl font-bold text-gray-800">- 명</h3><div class="member-list-popup" id="ceoMemberPopup"><p class="text-xs font-bold text-blue-600 mb-3 border-b pb-2 sticky top-0 bg-white">분석된 구성원 명단</p><div id="ceoPopupNameList" class="space-y-2 text-sm text-gray-600"></div></div></div><div class="stat-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-l-4 border-l-red-500"><p class="text-sm font-medium text-gray-500 mb-1">총 초과근무 시간</p><h3 id="ceo_stat_totalOver" class="text-3xl font-bold text-red-600">- 시간</h3></div><div class="stat-card clickable bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-l-4 border-l-amber-500" onclick="showCeoMissingModal()"><p class="text-sm font-medium text-gray-500 mb-1">⚠️ 근무 기록 누락</p><h3 id="ceo_stat_missingCount" class="text-3xl font-bold text-amber-600">- 건</h3><p class="text-xs text-gray-400 mt-1">클릭하여 상세 보기</p></div><div class="stat-card clickable bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-l-4 border-l-green-500" onclick="showCeoVacationModal()"><p class="text-sm font-medium text-gray-500 mb-1">🏖️ 총 휴가 사용</p><h3 id="ceo_stat_totalVacation" class="text-3xl font-bold text-green-600">- 일</h3><p class="text-xs text-gray-400 mt-1">클릭하여 상세 보기</p></div></div><div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8"><div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold text-gray-800 italic"># 조직별 초과근무 비율</h3><span class="text-sm text-gray-400">전체 100% 기준</span></div><div class="h-[300px] flex items-center justify-center"><canvas id="ceoTeamChart"></canvas></div><p class="team-chart-hint">💡 조직을 클릭하면 구성원 상세를 볼 수 있습니다</p></div><div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold text-gray-800 italic"># 인원별 초과근무 비율</h3><span class="text-sm text-gray-400">전체 100% 기준</span></div><div class="h-[300px] flex items-center justify-center"><canvas id="ceoDeptChart"></canvas></div></div><div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100"><h3 class="text-xl font-bold text-gray-800 mb-6 italic"># 초과근무 Top 5 구성원(월)</h3><div id="ceoTopList" class="space-y-4"></div></div></div><div class="grid grid-cols-1 gap-8"><div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100"><h3 class="text-xl font-bold text-gray-800 mb-6 italic" id="ceoTrendChartTitle"># 조직별 평균 근무 시간</h3><div id="ceoTrendChartsContainer"></div></div></div></div></div></div><script>
+                                    </button></div><div id="tab-overtime" class="analysis-tab-content active"><h3 class="text-md font-bold text-gray-700 mb-3">요일별 초과근무 횟수</h3><div class="text-xs text-gray-500 mb-3">8시간 이상 근무 (월~금)</div><div style="height: 200px;"><canvas id="weekdayOvertimeChart"></canvas></div></div><div id="tab-commute" class="analysis-tab-content" style="display: none;"><h3 class="text-md font-bold text-gray-700 mb-3">요일별 평균 출퇴근 시간</h3><div class="text-xs text-gray-500 mb-3">월~금 평균 시간</div><div style="height: 200px; position: relative;"><canvas id="weekdayCommuteChart" style="width: 100% !important; height: 100% !important;"></canvas></div></div></div></div></div><div class="bg-white rounded-xl p-6 mt-8 shadow-md border border-gray-200"><div class="flex flex-col md:flex-row md:items-start justify-between gap-3 mb-5"><div><h3 class="text-lg font-bold text-gray-800">📆 주차별 근무 현황 <span class="text-sm font-normal text-gray-400">(월~일 기준)</span></h3><p class="text-xs text-gray-500 mt-1">💡 주 소정근로 40시간 · 연장근로 한도 12시간 · 주 최대 52시간 기준으로 판정합니다. 행을 클릭하면 해당 주의 일자별 내역을 볼 수 있습니다.</p></div><div class="text-right"><div class="text-xs text-gray-500">주 평균 연장근무</div><div class="text-2xl font-bold text-red-600" id="member_val_weeklyAvgOver">-</div></div></div><div style="height: 300px;" class="mb-6"><canvas id="memberWeeklyChart"></canvas></div><div class="overflow-x-auto"><table class="weekly-table"><thead><tr><th>주차</th><th>기간</th><th>근무일</th><th>기준 근로시간</th><th>총 근무시간</th><th>연장근무</th><th>기록 누락</th><th>상태</th></tr></thead><tbody id="memberWeeklyTableBody"><tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:30px;">데이터가 없습니다.</td></tr></tbody></table></div></div></div></div></div></div></div><div id="ceoView" class="view"><div class="modal-overlay" id="ceoVacationModalOverlay"><div class="modal-content"><span class="modal-close" id="ceoVacationModalClose">&times;</span><div class="modal-title" id="ceoVacationModalTitle">🏖️ 휴가 사용 상세</div><div class="modal-list-wrapper" id="ceoVacationModalList"></div></div></div><div class="modal-overlay" id="ceoMissingModalOverlay"><div class="modal-content"><span class="modal-close" id="ceoMissingModalClose">&times;</span><div class="modal-title" id="ceoMissingModalTitle">⚠️ 근무 기록 누락 상세</div><div class="modal-list-wrapper" id="ceoMissingModalList"></div></div></div><div class="modal-overlay" id="ceoTeamDetailModalOverlay"><div class="modal-content"><span class="modal-close" id="ceoTeamDetailModalClose">&times;</span><div class="modal-title" id="ceoTeamDetailModalTitle">📊 조직별 구성원 초과근무 현황</div><div class="modal-list-wrapper" id="ceoTeamDetailModalList"></div></div></div><div class="modal-overlay" id="ceoWeeklyModalOverlay"><div class="modal-content"><span class="modal-close" id="ceoWeeklyModalClose">&times;</span><div class="modal-title" id="ceoWeeklyModalTitle">📆 주차별 초과근무 상세</div><div class="modal-list-wrapper" id="ceoWeeklyModalList"></div></div></div><div class="p-6 md:p-10"><div class="mx-auto" style="max-width: 2000px;"><header class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-6"><h1 class="text-3xl font-bold text-gray-800 flex items-center gap-3" style="min-width: 300px; word-break: keep-all; white-space: normal;"><span class="bg-blue-600 p-2 rounded-lg text-white text-xl">📊</span>전사 근태 분석 대시보드
+                    </h1><div class="flex gap-3"><button class="header-button" onclick="showView('list')" style="background: white; color: #667eea; border: 2px solid #667eea; padding: 10px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">← 구성원 목록</button></div></header><div class="month-tabs" id="ceoMonthTabs"><div class="month-tab active" data-month="1월" onclick="ceoSwitchMonth('1월')">📅 1월</div><div class="month-tab" data-month="2월" onclick="ceoSwitchMonth('2월')">📅 2월</div><div class="month-tab" data-month="3월" onclick="ceoSwitchMonth('3월')">📅 3월</div><div class="month-tab" data-month="4월" onclick="ceoSwitchMonth('4월')">📅 4월</div><div class="month-tab" data-month="5월" onclick="ceoSwitchMonth('5월')">📅 5월</div><div class="month-tab" data-month="6월" onclick="ceoSwitchMonth('6월')">📅 6월</div><div class="month-tab" data-month="7월" onclick="ceoSwitchMonth('7월')">📅 7월</div><div class="month-tab" data-month="8월" onclick="ceoSwitchMonth('8월')">📅 8월</div></div><div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8"><div class="stat-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100 cursor-pointer"><p class="text-sm font-medium text-gray-500 mb-1">총 분석 인원</p><h3 id="ceo_stat_totalPeople" class="text-3xl font-bold text-gray-800">- 명</h3><div class="member-list-popup" id="ceoMemberPopup"><p class="text-xs font-bold text-blue-600 mb-3 border-b pb-2 sticky top-0 bg-white">분석된 구성원 명단</p><div id="ceoPopupNameList" class="space-y-2 text-sm text-gray-600"></div></div></div><div class="stat-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-l-4 border-l-red-500"><p class="text-sm font-medium text-gray-500 mb-1">총 초과근무 시간</p><h3 id="ceo_stat_totalOver" class="text-3xl font-bold text-red-600">- 시간</h3></div><div class="stat-card clickable bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-l-4 border-l-amber-500" onclick="showCeoMissingModal()"><p class="text-sm font-medium text-gray-500 mb-1">⚠️ 근무 기록 누락</p><h3 id="ceo_stat_missingCount" class="text-3xl font-bold text-amber-600">- 건</h3><p class="text-xs text-gray-400 mt-1">클릭하여 상세 보기</p></div><div class="stat-card clickable bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-l-4 border-l-green-500" onclick="showCeoVacationModal()"><p class="text-sm font-medium text-gray-500 mb-1">🏖️ 총 휴가 사용</p><h3 id="ceo_stat_totalVacation" class="text-3xl font-bold text-green-600">- 일</h3><p class="text-xs text-gray-400 mt-1">클릭하여 상세 보기</p></div></div><div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8"><div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold text-gray-800 italic"># 조직별 초과근무 비율</h3><span class="text-sm text-gray-400">전체 100% 기준</span></div><div class="h-[300px] flex items-center justify-center"><canvas id="ceoTeamChart"></canvas></div><p class="team-chart-hint">💡 조직을 클릭하면 구성원 상세를 볼 수 있습니다</p></div><div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold text-gray-800 italic"># 인원별 초과근무 비율</h3><span class="text-sm text-gray-400">전체 100% 기준</span></div><div class="h-[300px] flex items-center justify-center"><canvas id="ceoDeptChart"></canvas></div></div><div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100"><h3 class="text-xl font-bold text-gray-800 mb-6 italic"># 초과근무 Top 5 구성원(월)</h3><div id="ceoTopList" class="space-y-4"></div></div></div><div class="grid grid-cols-1 gap-8"><div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100"><h3 class="text-xl font-bold text-gray-800 mb-6 italic" id="ceoTrendChartTitle"># 조직별 평균 근무 시간</h3><div id="ceoTrendChartsContainer"></div></div><div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100"><div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-6"><h3 class="text-xl font-bold text-gray-800 italic" id="ceoWeeklyChartTitle"># 주차별 초과근무 현황</h3><span class="text-sm text-gray-400">월~일 기준 · 주 연장 12시간 초과자 표시</span></div><div style="height: 320px;" class="mb-6"><canvas id="ceoWeeklyChart"></canvas></div><div class="overflow-x-auto"><table class="weekly-table"><thead><tr><th>주차</th><th>기간</th><th>총 초과근무</th><th>초과근무 인원</th><th>주 12시간 초과</th></tr></thead><tbody id="ceoWeeklyTableBody"><tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:30px;">데이터가 없습니다.</td></tr></tbody></table></div></div></div></div></div></div><script>
   // ============================================================
   // [담당자 전용 버전] 구성원 개별 로그인/이상없음 확인 기능 제거
   //   - 로그인: MANAGER_PASSWORD 하나로 모든 페이지 접근
@@ -220,7 +220,7 @@
    memberRawData = await loadSheetData(m);
    const tbody = document.getElementById('memberListBody');
    if (!memberRawData.length) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #94a3b8; padding: 40px;">해당 월의 데이터가 없습니다.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 40px;">해당 월의 데이터가 없습니다.</td></tr>';
     return;
    }
    const userSet = new Set(), uniqueUsers = [];
@@ -245,6 +245,7 @@
      totalHours: result.display.totalHours,
      overTime: result.display.overTime,
      vacation: result.display.vacation,
+     weeks: buildWeeklyStats(result.dayByDay),
      missingCount: result.dayByDay.filter(d => d.isMissing).length
     });
    });
@@ -259,6 +260,13 @@
     const missingBadge = r.missingCount > 0
      ? `<span class="missing-badge warn">${r.missingCount}건</span>`
      : `<span class="missing-badge ok">0건</span>`;
+    // 주(월~일) 단위 최대 연장근무 — 주 12시간(또는 주 52시간) 초과 여부를 한눈에
+    const maxWeek = r.weeks.reduce((best, w) => (!best || w.overMins > best.overMins) ? w : best, null);
+    const weekOverBadge = !maxWeek || maxWeek.overMins === 0
+     ? `<span class="week-badge ok">없음</span>`
+     : (r.weeks.some(w => w.isOverLimit)
+      ? `<span class="week-badge danger">${formatHoursMinutes(maxWeek.overMins)}</span>`
+      : `<span class="week-badge warn">${formatHoursMinutes(maxWeek.overMins)}</span>`);
     return `<tr onclick="openMemberDetail('${r.key}')">
      <td style="font-weight:700; color:#1e293b;">${r.displayName}</td>
      <td><span class="team-badge" style="background:${teamColor};">${r.team}</span></td>
@@ -267,6 +275,7 @@
      <td>${r.totalHours}</td>
      <td style="${r.overTime === '-' ? 'color:#94a3b8;' : 'color:#dc2626; font-weight:600;'}">${r.overTime}</td>
      <td>${r.vacation}</td>
+     <td>${weekOverBadge}</td>
      <td>${missingBadge}</td>
     </tr>`;
    }).join('');
@@ -340,10 +349,12 @@
   document.getElementById('ceoVacationModalClose').onclick = () => document.getElementById('ceoVacationModalOverlay').style.display = 'none';
   document.getElementById('ceoMissingModalClose').onclick = () => document.getElementById('ceoMissingModalOverlay').style.display = 'none';
   document.getElementById('ceoTeamDetailModalClose').onclick = () => document.getElementById('ceoTeamDetailModalOverlay').style.display = 'none';
+  document.getElementById('ceoWeeklyModalClose').onclick = () => document.getElementById('ceoWeeklyModalOverlay').style.display = 'none';
   window.addEventListener('click', (e) => {
    if (e.target === document.getElementById('ceoVacationModalOverlay')) document.getElementById('ceoVacationModalOverlay').style.display = 'none';
    if (e.target === document.getElementById('ceoMissingModalOverlay')) document.getElementById('ceoMissingModalOverlay').style.display = 'none';
    if (e.target === document.getElementById('ceoTeamDetailModalOverlay')) document.getElementById('ceoTeamDetailModalOverlay').style.display = 'none';
+   if (e.target === document.getElementById('ceoWeeklyModalOverlay')) document.getElementById('ceoWeeklyModalOverlay').style.display = 'none';
   });
   let memberRawData = [], memberModalChart = null, memberCurrentCalculatedData = null;
   function calculateOrgStats(month) {
@@ -618,6 +629,110 @@
    cache.set(key, computed);
    return computed;
   }
+  // ============================================================
+  // 주차(월~일) 단위 집계 공통 로직
+  //  - 주 소정근로 40시간 / 연장근로 한도 12시간 / 주 최대 52시간
+  //  - 월 단위 계산과 동일한 규칙(총 근무 = 실근무 + 휴가, 기준 = 근무일 × 8시간)
+  // ============================================================
+  const WEEK_OVER_LIMIT_MIN = 12 * 60;  // 주 연장근로 한도 12시간
+  const WEEK_TOTAL_LIMIT_MIN = 52 * 60; // 주 최대 근로시간 52시간
+  const WEEKDAY_NAMES = ['일', '월', '화', '수', '목', '금', '토'];
+  function parseRowDate(raw) {
+   if (!raw) return null;
+   if (raw instanceof Date) return isNaN(raw.getTime()) ? null : raw;
+   const cleaned = String(raw).trim().replace(/\.\s*/g, '-').replace(/-+$/, '');
+   const ymd = cleaned.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+   if (ymd) return new Date(Number(ymd[1]), Number(ymd[2]) - 1, Number(ymd[3]));
+   let d = new Date(cleaned);
+   if (isNaN(d.getTime())) d = new Date(String(raw).trim());
+   return isNaN(d.getTime()) ? null : d;
+  }
+  // 해당 날짜가 속한 주의 월요일
+  function getWeekStartDate(date) {
+   const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+   const diff = d.getDay() === 0 ? -6 : 1 - d.getDay(); // 일요일이면 지난 월요일
+   d.setDate(d.getDate() + diff);
+   return d;
+  }
+  function toDateKey(d) {
+   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+  function weekKeyOf(date) {
+   return toDateKey(getWeekStartDate(date));
+  }
+  // 이 시트가 어느 달인지 판정(가장 많이 등장한 연-월)
+  //  → 주 기간 표기를 그 달 범위로 잘라서 보여주기 위함 (예: 7/27~8/2 → 8/1~8/2)
+  function countMonth(counts, date) {
+   const k = `${date.getFullYear()}-${date.getMonth()}`;
+   counts.set(k, (counts.get(k) || 0) + 1);
+  }
+  function getMonthBounds(counts) {
+   let bestKey = null, bestCount = -1;
+   counts.forEach((n, k) => { if (n > bestCount) { bestCount = n; bestKey = k; } });
+   if (!bestKey) return null;
+   const [y, m] = bestKey.split('-').map(Number);
+   return { start: new Date(y, m, 1), end: new Date(y, m + 1, 0) };
+  }
+  function getWeekRangeDates(weekKey) {
+   const [y, m, d] = weekKey.split('-').map(Number);
+   return { start: new Date(y, m - 1, d), end: new Date(y, m - 1, d + 6) };
+  }
+  // 해당 월을 벗어나는 날짜는 잘라서 표기 (보는 사람이 다른 달 날짜에 혼동하지 않도록)
+  function formatWeekRange(weekKey, bounds) {
+   let { start, end } = getWeekRangeDates(weekKey);
+   if (bounds) {
+    if (start < bounds.start) start = bounds.start;
+    if (end > bounds.end) end = bounds.end;
+   }
+   const startText = `${start.getMonth() + 1}/${start.getDate()}`;
+   const endText = `${end.getMonth() + 1}/${end.getDate()}`;
+   return startText === endText ? startText : `${startText} ~ ${endText}`;
+  }
+  // 시트가 월 단위라 첫 주/마지막 주는 그 달에 걸친 날짜만 집계됨 → 표시용 플래그
+  function isPartialWeek(weekKey, bounds) {
+   if (!bounds) return false;
+   const { start, end } = getWeekRangeDates(weekKey);
+   return start < bounds.start || end > bounds.end;
+  }
+  // 구성원 1명의 일자별 결과(dayByDay)를 주차별로 묶음
+  function buildWeeklyStats(dayByDay) {
+   if (!dayByDay || !dayByDay.length) return [];
+   const map = new Map();
+   const monthCounts = new Map();
+   dayByDay.forEach(day => {
+    if (day.isBeforeJoinDate) return;
+    const dt = parseRowDate(day.rawDate);
+    if (!dt) return;
+    countMonth(monthCounts, dt);
+    const key = weekKeyOf(dt);
+    if (!map.has(key)) map.set(key, { key, days: [], workDays: 0, workMins: 0, vacationMins: 0, missingCount: 0 });
+    const w = map.get(key);
+    w.days.push({ day, dt });
+    if (day.isWorkDay) w.workDays++;
+    w.workMins += day.total;
+    w.vacationMins += day.vacation;
+    if (day.isMissing) w.missingCount++;
+   });
+   const bounds = getMonthBounds(monthCounts);
+   return Array.from(map.values())
+    .sort((a, b) => a.key.localeCompare(b.key))
+    // 근무일도 근무기록도 없는 주(달 경계에 주말만 걸친 주)는 제외
+    .filter(w => w.workDays > 0 || w.workMins > 0 || w.vacationMins > 0 || w.missingCount > 0)
+    .map((w, i) => {
+     const totalMins = w.workMins + w.vacationMins;
+     const stdMins = w.workDays * 480;
+     const overMins = Math.max(0, totalMins - stdMins);
+     const shortMins = Math.max(0, stdMins - totalMins); // 기준 근로시간 대비 부족분
+     w.days.sort((a, b) => a.dt - b.dt);
+     return Object.assign(w, {
+      index: i + 1,
+      label: formatWeekRange(w.key, bounds),
+      partial: isPartialWeek(w.key, bounds),
+      totalMins, stdMins, overMins, shortMins,
+      isOverLimit: overMins > WEEK_OVER_LIMIT_MIN || totalMins > WEEK_TOTAL_LIMIT_MIN
+     });
+    });
+  }
   function memberComputeData(key) {
    const [targetName, targetCompName] = key.split('|');
    const userRows = getRowsByUser(memberRawData).get(key) || [];
@@ -744,6 +859,7 @@
      in: finalIn,
      out: finalOut,
      isWorkDay: isWorkDay,
+     isBeforeJoinDate: day.isBeforeJoinDate,
      isMissing: (day.isMissing || isInsufficientTime) && !day.isBeforeJoinDate,
      policy: [...new Set(day.policies)].join(', '),
      vacationReason: [...new Set(day.leavePolicies)].join(', ')
@@ -936,6 +1052,137 @@
    } else {
     updateWeekdayOvertimeChart([0, 0, 0, 0, 0]);
    }
+   updateMemberWeeklyView(result);
+  }
+  // ===== 구성원 주차별 근무 현황 =====
+  let memberWeeklyStats = [];
+  let memberWeeklyChart = null;
+  function updateMemberWeeklyView(result) {
+   const tbody = document.getElementById('memberWeeklyTableBody');
+   const avgEl = document.getElementById('member_val_weeklyAvgOver');
+   memberWeeklyStats = result ? buildWeeklyStats(result.dayByDay) : [];
+   if (!tbody) return;
+   if (!memberWeeklyStats.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:30px;">데이터가 없습니다.</td></tr>';
+    if (avgEl) avgEl.innerText = '-';
+    updateMemberWeeklyChart([]);
+    return;
+   }
+   tbody.innerHTML = memberWeeklyStats.map(w => {
+    // 기준 근로시간 대비: 미만이면 부족(빨강) / 일치하면 정상 / 초과하면 연장근무
+    let badge = '<span class="week-badge ok">정상</span>';
+    if (w.shortMins > 0) {
+     badge = `<span class="week-badge short">부족 ${formatHoursMinutes(w.shortMins)}</span>`;
+    } else if (w.isOverLimit) {
+     badge = '<span class="week-badge danger">한도 초과</span>';
+    } else if (w.overMins > 0) {
+     badge = '<span class="week-badge warn">연장근무</span>';
+    }
+    const missingBadge = w.missingCount > 0
+     ? `<span class="missing-badge warn">${w.missingCount}건</span>`
+     : '<span class="missing-badge ok">0건</span>';
+    const partial = w.partial ? '<span class="week-partial">(일부)</span>' : '';
+    const overStyle = w.isOverLimit
+     ? 'color:#dc2626;font-weight:700;'
+     : (w.overMins > 0 ? 'color:#b45309;font-weight:600;' : 'color:#94a3b8;');
+    const overText = w.overMins > 0
+     ? formatHoursMinutes(w.overMins)
+     : (w.shortMins > 0 ? `<span style="color:#dc2626;font-weight:700;">-${formatHoursMinutes(w.shortMins)}</span>` : '-');
+    return `<tr onclick="memberShowWeekDetail('${w.key}')">
+     <td style="font-weight:700;color:#1e293b;">${w.index}주차</td>
+     <td>${w.label}${partial}</td>
+     <td>${w.workDays}일</td>
+     <td style="color:#64748b;">${formatHoursMinutes(w.stdMins)}</td>
+     <td style="font-weight:600;">${formatHoursMinutes(w.totalMins)}</td>
+     <td style="${overStyle}">${overText}</td>
+     <td>${missingBadge}</td>
+     <td>${badge}</td>
+    </tr>`;
+   }).join('');
+   if (avgEl) {
+    const counted = memberWeeklyStats.filter(w => w.workDays > 0);
+    const avgOver = counted.length
+     ? counted.reduce((sum, w) => sum + w.overMins, 0) / counted.length
+     : 0;
+    avgEl.innerText = avgOver > 0 ? formatHoursMinutes(avgOver) : '0시간';
+   }
+   updateMemberWeeklyChart(memberWeeklyStats);
+  }
+  function updateMemberWeeklyChart(weeks) {
+   const canvas = document.getElementById('memberWeeklyChart');
+   if (!canvas) return;
+   if (memberWeeklyChart) { memberWeeklyChart.destroy(); memberWeeklyChart = null; }
+   if (!weeks.length) return;
+   memberWeeklyChart = new Chart(canvas.getContext('2d'), {
+    type: 'bar',
+    data: {
+     labels: weeks.map(w => [`${w.index}주차`, w.label]),
+     datasets: [
+      { label: '실근무', data: weeks.map(w => w.workMins), backgroundColor: 'rgba(59,130,246,0.85)', borderRadius: 4, stack: 'work' },
+      { label: '휴가', data: weeks.map(w => w.vacationMins), backgroundColor: 'rgba(16,185,129,0.85)', borderRadius: 4, stack: 'work' }
+     ]
+    },
+    options: {
+     responsive: true,
+     maintainAspectRatio: false,
+     plugins: {
+      legend: { position: 'top', labels: { usePointStyle: true, font: { size: 12 } } },
+      tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${formatHoursMinutes(c.parsed.y)}` } }
+     },
+     scales: {
+      x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11 } } },
+      y: { stacked: true, beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { callback: v => `${Math.round(v / 60)}h` } }
+     }
+    }
+   });
+  }
+  function memberShowWeekDetail(weekKey) {
+   const week = memberWeeklyStats.find(w => w.key === weekKey);
+   if (!week) return;
+   const overlay = document.getElementById('memberModalOverlay');
+   const title = document.getElementById('memberModalTitle');
+   const list = document.getElementById('memberModalList');
+   const ctx = document.getElementById('memberModalChart').getContext('2d');
+   if (memberModalChart) memberModalChart.destroy();
+   const diffText = week.shortMins > 0
+    ? `<span style="color:#dc2626;font-weight:700;">부족 ${formatHoursMinutes(week.shortMins)}</span>`
+    : (week.overMins > 0 ? `연장 ${formatHoursMinutes(week.overMins)}` : '기준 시간 충족');
+   const summary = `근무 ${week.workDays}일 · 기준 ${formatHoursMinutes(week.stdMins)} · 총 ${formatHoursMinutes(week.totalMins)} · ${diffText}`;
+   title.innerHTML = `📆 ${week.index}주차 (${week.label}) 상세<div style="font-size:13px;font-weight:500;color:#64748b;margin-top:6px;">${summary}${week.isOverLimit ? ' · <span style="color:#dc2626;font-weight:700;">주 한도 초과</span>' : ''}</div>`;
+   const detailDays = week.days.filter(({ day }) => day.isWorkDay || day.isMissing || (day.total + day.vacation) > 0);
+   list.innerHTML = detailDays.map(({ day, dt }) => {
+    const dow = WEEKDAY_NAMES[dt.getDay()];
+    const totalWithVacation = day.total + day.vacation;
+    const timeRange = (day.in > 0 && day.out > 0)
+     ? `${memberFormatMinutes(day.in, 'colon')} ~ ${memberFormatMinutes(day.out, 'colon')}`
+     : '기록 없음';
+    const vacationText = day.vacation > 0 ? ` · 휴가 ${memberFormatMinutes(day.vacation)}` : '';
+    const style = day.isMissing ? ' style="color:#ef4444;"' : '';
+    return `<div class="modal-list-item"${style}>
+     <span><span style="font-weight:600;">${day.date}(${dow})</span> <span style="color:#94a3b8;font-size:13px;">${timeRange}</span></span>
+     <span>${formatHoursMinutes(totalWithVacation)}${vacationText}${day.isMissing ? ' ⚠️' : ''}</span>
+    </div>`;
+   }).join('') || '<div class="text-center text-gray-400 py-4">해당 주의 기록이 없습니다.</div>';
+   memberModalChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+     labels: detailDays.map(({ day, dt }) => `${day.date}(${WEEKDAY_NAMES[dt.getDay()]})`),
+     datasets: [
+      { label: '실근무', data: detailDays.map(({ day }) => day.total), backgroundColor: '#3b82f6' },
+      { label: '휴가', data: detailDays.map(({ day }) => day.vacation), backgroundColor: '#10b981' }
+     ]
+    },
+    options: {
+     responsive: true,
+     maintainAspectRatio: false,
+     plugins: { tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${formatHoursMinutes(c.parsed.y)}` } } },
+     scales: {
+      x: { stacked: true },
+      y: { stacked: true, beginAtZero: true, ticks: { callback: v => `${Math.round(v / 60)}h` } }
+     }
+    }
+   });
+   overlay.style.display = 'flex';
   }
   function switchAnalysisTab(tabName) {
    document.querySelectorAll('.analysis-tab').forEach(tab => tab.classList.remove('active'));
@@ -1430,8 +1677,125 @@
    });
    ceoTrendCharts.push(chart);
   }
+  // ===== 전사 주차별 초과근무 =====
+  let ceoWeeklyChart = null;
+  let ceoWeeklyStats = [];
+  function renderCeoWeekly(weeklyAgg, bounds) {
+   const titleEl = document.getElementById('ceoWeeklyChartTitle');
+   if (titleEl) titleEl.textContent = `# ${currentCeoMonth} 주차별 초과근무 현황`;
+   ceoWeeklyStats = Array.from(weeklyAgg.values())
+    .sort((a, b) => a.key.localeCompare(b.key))
+    // 근무일도 근무기록도 없는 주(달 경계에 주말만 걸친 주)는 제외
+    .filter(w => w.workDays > 0 || w.totalMins > 0)
+    .map((w, i) => {
+     w.members.sort((a, b) => b.overMins - a.overMins);
+     return Object.assign(w, {
+      index: i + 1,
+      label: formatWeekRange(w.key, bounds),
+      partial: isPartialWeek(w.key, bounds),
+      overLimitMembers: w.members.filter(m => m.overMins > WEEK_OVER_LIMIT_MIN || m.totalMins > WEEK_TOTAL_LIMIT_MIN)
+     });
+    });
+   const tbody = document.getElementById('ceoWeeklyTableBody');
+   if (tbody) {
+    tbody.innerHTML = ceoWeeklyStats.length === 0
+     ? '<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:30px;">데이터가 없습니다.</td></tr>'
+     : ceoWeeklyStats.map(w => {
+      const partial = w.partial ? '<span class="week-partial">(일부)</span>' : '';
+      const limitBadge = w.overLimitMembers.length > 0
+       ? `<span class="week-badge danger">${w.overLimitMembers.length}명</span>`
+       : '<span class="week-badge ok">0명</span>';
+      return `<tr onclick="showCeoWeeklyModal('${w.key}')">
+       <td style="font-weight:700;color:#1e293b;">${w.index}주차</td>
+       <td>${w.label}${partial}</td>
+       <td style="color:#dc2626;font-weight:600;">${w.overMins > 0 ? ceoFormatHoursMinutes(w.overMins) : '-'}</td>
+       <td>${w.members.length}명</td>
+       <td>${limitBadge}</td>
+      </tr>`;
+     }).join('');
+   }
+   const canvas = document.getElementById('ceoWeeklyChart');
+   if (!canvas) return;
+   if (ceoWeeklyChart) { ceoWeeklyChart.destroy(); ceoWeeklyChart = null; }
+   if (!ceoWeeklyStats.length) return;
+   ceoWeeklyChart = new Chart(canvas.getContext('2d'), {
+    type: 'bar',
+    data: {
+     labels: ceoWeeklyStats.map(w => [`${w.index}주차`, w.label]),
+     datasets: [
+      {
+       label: '총 초과근무',
+       data: ceoWeeklyStats.map(w => w.overMins),
+       backgroundColor: 'rgba(239,68,68,0.8)',
+       borderRadius: 6,
+       yAxisID: 'y',
+       order: 2
+      },
+      {
+       type: 'line',
+       label: '주 12시간 초과 인원',
+       data: ceoWeeklyStats.map(w => w.overLimitMembers.length),
+       borderColor: '#f59e0b',
+       backgroundColor: '#f59e0b',
+       borderWidth: 2,
+       tension: 0.3,
+       pointRadius: 4,
+       yAxisID: 'y1',
+       order: 1
+      }
+     ]
+    },
+    options: {
+     responsive: true,
+     maintainAspectRatio: false,
+     onClick: (event, elements) => {
+      if (elements.length > 0) showCeoWeeklyModal(ceoWeeklyStats[elements[0].index].key);
+     },
+     plugins: {
+      legend: { position: 'top', labels: { usePointStyle: true, font: { size: 12 } } },
+      tooltip: {
+       callbacks: {
+        label: c => c.dataset.yAxisID === 'y1'
+         ? ` 주 12시간 초과 인원: ${c.parsed.y}명`
+         : ` 총 초과근무: ${ceoFormatHoursMinutes(c.parsed.y)}`
+       }
+      }
+     },
+     scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+      y: { beginAtZero: true, position: 'left', grid: { color: '#f1f5f9' }, ticks: { callback: v => `${Math.round(v / 60)}h` }, title: { display: true, text: '총 초과근무' } },
+      y1: { beginAtZero: true, position: 'right', grid: { display: false }, ticks: { stepSize: 1, callback: v => `${v}명` }, title: { display: true, text: '한도 초과 인원' } }
+     }
+    }
+   });
+  }
+  function showCeoWeeklyModal(weekKey) {
+   const week = ceoWeeklyStats.find(w => w.key === weekKey);
+   if (!week) return;
+   const overlay = document.getElementById('ceoWeeklyModalOverlay');
+   const title = document.getElementById('ceoWeeklyModalTitle');
+   const list = document.getElementById('ceoWeeklyModalList');
+   title.innerHTML = `📆 ${week.index}주차 (${week.label}) 초과근무 상세<div style="font-size:13px;font-weight:500;color:#64748b;margin-top:6px;">총 ${ceoFormatHoursMinutes(week.overMins)} · 초과근무 ${week.members.length}명 · 주 12시간 초과 ${week.overLimitMembers.length}명</div>`;
+   list.innerHTML = week.members.length === 0
+    ? '<div class="text-center text-gray-400 py-4">해당 주에는 초과근무가 없습니다.</div>'
+    : week.members.map((m, idx) => {
+     const isOver = m.overMins > WEEK_OVER_LIMIT_MIN || m.totalMins > WEEK_TOTAL_LIMIT_MIN;
+     const flag = isOver ? '<span class="week-badge danger" style="margin-left:8px;">한도 초과</span>' : '';
+     return `<div class="modal-list-item">
+      <span class="flex items-center gap-2">
+       <span class="w-6 h-6 flex items-center justify-center bg-blue-100 text-blue-600 rounded-full text-xs font-bold">${idx + 1}</span>
+       <span class="font-medium">${m.name}</span>
+       <span class="text-[11px] text-gray-400">${m.dept}</span>${flag}
+      </span>
+      <span style="${isOver ? 'color:#dc2626;' : 'color:#b45309;'}font-weight:700;">${ceoFormatHoursMinutes(m.overMins)} <span style="color:#94a3b8;font-weight:400;font-size:12px;">(총 ${ceoFormatHoursMinutes(m.totalMins)})</span></span>
+     </div>`;
+    }).join('');
+   overlay.style.display = 'flex';
+  }
   async function ceoProcessExcel(data) {
    const users = {}, departments = {}, teams = {}, missingStats = {};
+   const ceoWeeklyAgg = new Map(); // 주차별 전사 집계 (월~일)
+   const ceoMonthCounts = new Map(); // 이 시트가 속한 달 판정용
    let totalOverMins = 0, totalMissingCount = 0;
    data.forEach(row => {
     const name = row['이름'], dept = row['회사내 이름'] || '미분류';
@@ -1467,6 +1831,7 @@
      }
      if (!users[userId].dailyMap.has(dateKey)) {
       users[userId].dailyMap.set(dateKey, {
+       rawDate: dateStr,
        inMin: Infinity,
        outMax: -Infinity,
        vacationMins: 0,
@@ -1496,6 +1861,7 @@
     let workDays = 0;
     let totalMins = 0;
     let missingCount = 0;
+    const userWeeks = new Map(); // 이 구성원의 주차별 근무 (월~일)
     user.dailyMap.forEach((dayData, dateKey) => {
      const isWorkDay = !dayData.hasHolidayType;
      if (isWorkDay) {
@@ -1512,10 +1878,30 @@
      }
      const dayTotal = dayWorkMins + dayData.vacationMins;
      totalMins += dayTotal;
+     const dayDate = parseRowDate(dayData.rawDate);
+     if (dayDate) {
+      countMonth(ceoMonthCounts, dayDate);
+      const wKey = weekKeyOf(dayDate);
+      if (!userWeeks.has(wKey)) userWeeks.set(wKey, { workDays: 0, totalMins: 0 });
+      const wAgg = userWeeks.get(wKey);
+      if (isWorkDay) wAgg.workDays++;
+      wAgg.totalMins += dayTotal;
+     }
      const isNoPolicy = !dayData.hasPolicy;
      const isInsufficientTime = isWorkDay && dayTotal > 0 && dayTotal < MIN_DAILY_WORK_MIN;
      if (isWorkDay && (isNoPolicy || isInsufficientTime)) {
       missingCount++;
+     }
+    });
+    userWeeks.forEach((w, wKey) => {
+     const wOverMins = Math.max(0, w.totalMins - w.workDays * 480);
+     if (!ceoWeeklyAgg.has(wKey)) ceoWeeklyAgg.set(wKey, { key: wKey, overMins: 0, workDays: 0, totalMins: 0, members: [] });
+     const agg = ceoWeeklyAgg.get(wKey);
+     agg.overMins += wOverMins;
+     agg.workDays += w.workDays;
+     agg.totalMins += w.totalMins;
+     if (wOverMins > 0) {
+      agg.members.push({ name: user.name, dept: user.dept, overMins: wOverMins, totalMins: w.totalMins, workDays: w.workDays });
      }
     });
     user.workDays = workDays;
@@ -1577,6 +1963,7 @@
    });
    const orgMonthlyData = getCurrentMonthOrgData();
    ceoInitCharts({ labels: deptLabels, values: deptValues }, { labels: teamLabels, values: teamValues }, orgMonthlyData);
+   renderCeoWeekly(ceoWeeklyAgg, getMonthBounds(ceoMonthCounts));
   }
   document.getElementById('passwordInput').addEventListener('keypress', (e) => {
    if (e.key === 'Enter') {
